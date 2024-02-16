@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.RandomPositionGenerator;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -52,9 +53,10 @@ public class EntityAIBabyPanic extends EntityAIBase
 		while(iterator.hasNext())
 		{
 			EntityCreature entitycreature = (EntityCreature) iterator.next();
-			if(this.creature != entitycreature && entitycreature.getAttackTarget() == null && ((EntityAnimal) entitycreature).getAge() >= 0 && !entitycreature.isOnSameTeam(this.creature.getAITarget()) && this.creature.worldObj.rand.nextInt(2) == 0)
+			EntityLivingBase aiTarget = this.creature.getAITarget();
+			if(this.creature != entitycreature && entitycreature.getAttackTarget() == null && ((EntityAnimal) entitycreature).getAge() >= 0 && aiTarget != null && !entitycreature.isOnSameTeam(aiTarget) && this.creature.worldObj.rand.nextInt(2) == 0)
 			{
-				entitycreature.setAttackTarget(this.creature.getAITarget());
+				entitycreature.setAttackTarget(aiTarget);
 			}
 		}
 	}
