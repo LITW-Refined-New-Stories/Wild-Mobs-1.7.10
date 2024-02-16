@@ -2,6 +2,12 @@ package com.wildmobsmod.entity.monster.skeletonwolf;
 
 import java.util.List;
 
+import com.wildmobsmod.entity.ai.EntityAIFollowSkeleton;
+import com.wildmobsmod.entity.ai.EntityAISkeletonHurtByTarget;
+import com.wildmobsmod.entity.ai.EntityAISkeletonHurtTarget;
+import com.wildmobsmod.entity.ai.EntityAIWatchSkeleton;
+import com.wildmobsmod.entity.monster.dreath.EntityDreath;
+
 import net.minecraft.block.Block;
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
@@ -33,199 +39,225 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderHell;
 
-import com.wildmobsmod.entity.ai.EntityAIFollowSkeleton;
-import com.wildmobsmod.entity.ai.EntityAISkeletonHurtByTarget;
-import com.wildmobsmod.entity.ai.EntityAISkeletonHurtTarget;
-import com.wildmobsmod.entity.ai.EntityAIWatchSkeleton;
-import com.wildmobsmod.entity.monster.dreath.EntityDreath;
+public class EntitySkeletonWolf extends EntityMob
+{
+	// This determines the mob the skeleton wolf should follow. The mob
+	// automatically chooses the closest skeleton/dreath to it, and will start
+	// to follow it.
+	public EntityLiving entityToFollow;
 
-public class EntitySkeletonWolf extends EntityMob {
+	public final IEntitySelector followSkeleton = new IEntitySelector()
+	{
+		public boolean isEntityApplicable(Entity entity)
+		{
+			return entity.isEntityAlive() && EntitySkeletonWolf.this.getEntitySenses().canSee(entity) && (entity instanceof EntitySkeleton || entity instanceof EntityDreath);
+		}
+	};
 
-    // This determines the mob the skeleton wolf should follow. The mob
-    // automatically chooses the closest skeleton/dreath to it, and will start
-    // to follow it.
-    public EntityLiving entityToFollow;
+	public EntitySkeletonWolf(World world)
+	{
+		super(world);
+		this.setSize(0.6F, 0.8F);
+		this.getNavigator().setAvoidsWater(true);
+		this.tasks.addTask(1, new EntityAISwimming(this));
+		this.tasks.addTask(2, new EntityAILeapAtTarget(this, 0.4F));
+		this.tasks.addTask(3, new EntityAIAttackOnCollide(this, 1.4D, true));
+		this.tasks.addTask(4, new EntityAIRestrictSun(this));
+		this.tasks.addTask(5, new EntityAIFleeSun(this, 1.0D));
+		this.tasks.addTask(6, new EntityAIFollowSkeleton(this, 1.0D));
+		this.tasks.addTask(7, new EntityAIWander(this, 1.0D));
+		this.tasks.addTask(8, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
+		this.tasks.addTask(8, new EntityAIWatchSkeleton(this, 8.0F));
+		this.tasks.addTask(8, new EntityAILookIdle(this));
+		this.targetTasks.addTask(1, new EntityAISkeletonHurtByTarget(this));
+		this.targetTasks.addTask(2, new EntityAISkeletonHurtTarget(this));
+		this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, false));
+		this.targetTasks.addTask(4, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, true));
+		this.experienceValue = 5;
+	}
 
-    public final IEntitySelector followSkeleton = new IEntitySelector() {
+	protected void applyEntityAttributes()
+	{
+		super.applyEntityAttributes();
+		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.30000001192092896D);
+		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20.0D);
+	}
 
-        public boolean isEntityApplicable(Entity entity) {
-            return entity.isEntityAlive() && EntitySkeletonWolf.this.getEntitySenses()
-                .canSee(entity) && (entity instanceof EntitySkeleton || entity instanceof EntityDreath);
-        }
-    };
+	protected void entityInit()
+	{
+		super.entityInit();
+		this.dataWatcher.addObject(13, new Byte((byte) 0));
+	}
 
-    public EntitySkeletonWolf(World world) {
-        super(world);
-        this.setSize(0.6F, 0.8F);
-        this.getNavigator()
-            .setAvoidsWater(true);
-        this.tasks.addTask(1, new EntityAISwimming(this));
-        this.tasks.addTask(2, new EntityAILeapAtTarget(this, 0.4F));
-        this.tasks.addTask(3, new EntityAIAttackOnCollide(this, 1.4D, true));
-        this.tasks.addTask(4, new EntityAIRestrictSun(this));
-        this.tasks.addTask(5, new EntityAIFleeSun(this, 1.0D));
-        this.tasks.addTask(6, new EntityAIFollowSkeleton(this, 1.0D));
-        this.tasks.addTask(7, new EntityAIWander(this, 1.0D));
-        this.tasks.addTask(8, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
-        this.tasks.addTask(8, new EntityAIWatchSkeleton(this, 8.0F));
-        this.tasks.addTask(8, new EntityAILookIdle(this));
-        this.targetTasks.addTask(1, new EntityAISkeletonHurtByTarget(this));
-        this.targetTasks.addTask(2, new EntityAISkeletonHurtTarget(this));
-        this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, false));
-        this.targetTasks.addTask(4, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, true));
-        this.experienceValue = 5;
-    }
+	public boolean isAIEnabled()
+	{
+		return true;
+	}
 
-    protected void applyEntityAttributes() {
-        super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed)
-            .setBaseValue(0.30000001192092896D);
-        this.getEntityAttribute(SharedMonsterAttributes.maxHealth)
-            .setBaseValue(20.0D);
-    }
+	protected String getLivingSound()
+	{
+		return "mob.skeleton.say";
+	}
 
-    protected void entityInit() {
-        super.entityInit();
-        this.dataWatcher.addObject(13, new Byte((byte) 0));
-    }
+	protected String getHurtSound()
+	{
+		return "mob.skeleton.hurt";
+	}
 
-    public boolean isAIEnabled() {
-        return true;
-    }
+	protected String getDeathSound()
+	{
+		return "mob.skeleton.death";
+	}
 
-    protected String getLivingSound() {
-        return "mob.skeleton.say";
-    }
+	protected void func_145780_a(int x, int y, int z, Block block)
+	{
+		this.playSound("mob.skeleton.step", 0.15F, 1.0F);
+	}
 
-    protected String getHurtSound() {
-        return "mob.skeleton.hurt";
-    }
+	public EnumCreatureAttribute getCreatureAttribute()
+	{
+		return EnumCreatureAttribute.UNDEAD;
+	}
 
-    protected String getDeathSound() {
-        return "mob.skeleton.death";
-    }
+	public float getEyeHeight()
+	{
+		return this.height * 0.8F;
+	}
 
-    protected void func_145780_a(int x, int y, int z, Block block) {
-        this.playSound("mob.skeleton.step", 0.15F, 1.0F);
-    }
+	public boolean attackEntityAsMob(Entity entity)
+	{
+		if(this.getSkeletonType() == 1 && entity instanceof EntityLivingBase)
+		{
+			((EntityLivingBase) entity).addPotionEffect(new PotionEffect(Potion.wither.id, 100));
+		}
+		return entity.attackEntityFrom(DamageSource.causeMobDamage(this), 5.0F);
+	}
 
-    public EnumCreatureAttribute getCreatureAttribute() {
-        return EnumCreatureAttribute.UNDEAD;
-    }
+	public void onLivingUpdate()
+	{
+		if(this.worldObj.isDaytime() && !this.worldObj.isRemote)
+		{
+			float f = this.getBrightness(1.0F);
 
-    public float getEyeHeight() {
-        return this.height * 0.8F;
-    }
+			if(f > 0.5F && this.rand.nextFloat() * 30.0F < (f - 0.4F) * 2.0F && this.worldObj.canBlockSeeTheSky(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)))
+			{
+				this.setFire(8);
+			}
+		}
 
-    public boolean attackEntityAsMob(Entity entity) {
-        if (this.getSkeletonType() == 1 && entity instanceof EntityLivingBase) {
-            ((EntityLivingBase) entity).addPotionEffect(new PotionEffect(Potion.wither.id, 100));
-        }
-        return entity.attackEntityFrom(DamageSource.causeMobDamage(this), 5.0F);
-    }
+		if(this.worldObj.isRemote && this.getSkeletonType() == 1)
+		{
+			this.setSize(0.72F, 0.96F);
+		}
+		else
+		{
+			this.setSize(0.6F, 0.8F);
+		}
 
-    public void onLivingUpdate() {
-        if (this.worldObj.isDaytime() && !this.worldObj.isRemote) {
-            float f = this.getBrightness(1.0F);
+		if(this.entityToFollow != null && !this.worldObj.isRemote)
+		{
+			if(!this.entityToFollow.isEntityAlive())
+			{
+				this.entityToFollow = null;
+			}
+		}
 
-            if (f > 0.5F && this.rand.nextFloat() * 30.0F < (f - 0.4F) * 2.0F
-                && this.worldObj.canBlockSeeTheSky(
-                    MathHelper.floor_double(this.posX),
-                    MathHelper.floor_double(this.posY),
-                    MathHelper.floor_double(this.posZ))) {
-                this.setFire(8);
-            }
-        }
+		if(this.entityToFollow == null && !this.worldObj.isRemote)
+		{
+			this.findMobToFollow();
+		}
 
-        if (this.worldObj.isRemote && this.getSkeletonType() == 1) {
-            this.setSize(0.72F, 0.96F);
-        } else {
-            this.setSize(0.6F, 0.8F);
-        }
+		super.onLivingUpdate();
+	}
 
-        if (this.entityToFollow != null && !this.worldObj.isRemote) {
-            if (!this.entityToFollow.isEntityAlive()) {
-                this.entityToFollow = null;
-            }
-        }
+	protected void findMobToFollow()
+	{
+		List list = this.worldObj.selectEntitiesWithinAABB(EntityMob.class, this.boundingBox.expand(16.0D, 16.0D, 16.0D), this.followSkeleton);
 
-        if (this.entityToFollow == null && !this.worldObj.isRemote) {
-            this.findMobToFollow();
-        }
+		if(list.isEmpty())
+		{
+		}
+		else if(this.entityToFollow == null)
+		{
+			this.entityToFollow = (EntityLiving) list.get(0);
+		}
+	}
 
-        super.onLivingUpdate();
-    }
+	protected Item getDropItem()
+	{
+		return Items.bone;
+	}
 
-    protected void findMobToFollow() {
-        List list = this.worldObj.selectEntitiesWithinAABB(
-            EntityMob.class,
-            this.boundingBox.expand(16.0D, 16.0D, 16.0D),
-            this.followSkeleton);
+	public IEntityLivingData onSpawnWithEgg(IEntityLivingData data)
+	{
+		data = super.onSpawnWithEgg(data);
 
-        if (list.isEmpty()) {} else if (this.entityToFollow == null) {
-            this.entityToFollow = (EntityLiving) list.get(0);
-        }
-    }
+		if(this.worldObj.provider instanceof WorldProviderHell && this.getRNG().nextInt(5) > 0)
+		{
+			this.setSkeletonType(1);
+		}
+		else
+		{
+			this.setSkeletonType(0);
+		}
 
-    protected Item getDropItem() {
-        return Items.bone;
-    }
+		return data;
+	}
 
-    public IEntityLivingData onSpawnWithEgg(IEntityLivingData data) {
-        data = super.onSpawnWithEgg(data);
+	protected void dropFewItems(boolean playerkill, int looting)
+	{
+		int j = this.rand.nextInt(3 + looting);
 
-        if (this.worldObj.provider instanceof WorldProviderHell && this.getRNG()
-            .nextInt(5) > 0) {
-            this.setSkeletonType(1);
-        } else {
-            this.setSkeletonType(0);
-        }
+		for(int k = 0; k < j; ++k)
+		{
+			this.dropItem(Items.bone, 1);
+		}
 
-        return data;
-    }
+		if(this.getSkeletonType() == 1)
+		{
+			j = this.rand.nextInt(3 + looting) - 1;
 
-    protected void dropFewItems(boolean playerkill, int looting) {
-        int j = this.rand.nextInt(3 + looting);
+			for(int k = 0; k < j; ++k)
+			{
+				this.dropItem(Items.coal, 1);
+			}
+		}
+	}
 
-        for (int k = 0; k < j; ++k) {
-            this.dropItem(Items.bone, 1);
-        }
+	public int getSkeletonType()
+	{
+		return this.dataWatcher.getWatchableObjectByte(13);
+	}
 
-        if (this.getSkeletonType() == 1) {
-            j = this.rand.nextInt(3 + looting) - 1;
+	public void setSkeletonType(int type)
+	{
+		this.dataWatcher.updateObject(13, Byte.valueOf((byte) type));
+		this.isImmuneToFire = type == 1;
 
-            for (int k = 0; k < j; ++k) {
-                this.dropItem(Items.coal, 1);
-            }
-        }
-    }
+		if(type == 1)
+		{
+			this.setSize(0.72F, 0.96F);
+		}
+		else
+		{
+			this.setSize(0.6F, 0.8F);
+		}
+	}
 
-    public int getSkeletonType() {
-        return this.dataWatcher.getWatchableObjectByte(13);
-    }
+	public void readEntityFromNBT(NBTTagCompound nbt)
+	{
+		super.readEntityFromNBT(nbt);
 
-    public void setSkeletonType(int type) {
-        this.dataWatcher.updateObject(13, Byte.valueOf((byte) type));
-        this.isImmuneToFire = type == 1;
+		if(nbt.hasKey("SkeletonType", 99))
+		{
+			byte b0 = nbt.getByte("SkeletonType");
+			this.setSkeletonType(b0);
+		}
+	}
 
-        if (type == 1) {
-            this.setSize(0.72F, 0.96F);
-        } else {
-            this.setSize(0.6F, 0.8F);
-        }
-    }
-
-    public void readEntityFromNBT(NBTTagCompound nbt) {
-        super.readEntityFromNBT(nbt);
-
-        if (nbt.hasKey("SkeletonType", 99)) {
-            byte b0 = nbt.getByte("SkeletonType");
-            this.setSkeletonType(b0);
-        }
-    }
-
-    public void writeEntityToNBT(NBTTagCompound nbt) {
-        super.writeEntityToNBT(nbt);
-        nbt.setByte("SkeletonType", (byte) this.getSkeletonType());
-    }
+	public void writeEntityToNBT(NBTTagCompound nbt)
+	{
+		super.writeEntityToNBT(nbt);
+		nbt.setByte("SkeletonType", (byte) this.getSkeletonType());
+	}
 }
