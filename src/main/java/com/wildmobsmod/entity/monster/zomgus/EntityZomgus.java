@@ -1,8 +1,5 @@
 package com.wildmobsmod.entity.monster.zomgus;
 
-import com.wildmobsmod.items.WildMobsModItems;
-import com.wildmobsmod.main.WildMobsMod;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityLivingData;
@@ -13,83 +10,68 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 
-public class EntityZomgus extends EntityZombie
-{
-	public EntityZomgus(World world)
-	{
-		super(world);
-		this.getNavigator().setAvoidsWater(true);
-	}
+import com.wildmobsmod.items.WildMobsModItems;
+import com.wildmobsmod.main.WildMobsMod;
 
-	public int getMaxSpawnedInChunk()
-	{
-		return WildMobsMod.ZOMGUS_CONFIG.getMaxPackSize();
-	}
+public class EntityZomgus extends EntityZombie {
 
-	protected void applyEntityAttributes()
-	{
-		super.applyEntityAttributes();
-	}
+    public EntityZomgus(World world) {
+        super(world);
+        this.getNavigator()
+            .setAvoidsWater(true);
+    }
 
-	public boolean attackEntityAsMob(Entity target)
-	{
-		if(super.attackEntityAsMob(target))
-		{
-			if(target instanceof EntityLivingBase)
-			{
-				byte b0 = 0;
+    public int getMaxSpawnedInChunk() {
+        return WildMobsMod.ZOMGUS_CONFIG.getMaxPackSize();
+    }
 
-				if(this.worldObj.difficultySetting == EnumDifficulty.EASY)
-				{
-					b0 = 5;
-				}
-				else if(this.worldObj.difficultySetting == EnumDifficulty.NORMAL)
-				{
-					b0 = 8;
-				}
-				else if(this.worldObj.difficultySetting == EnumDifficulty.HARD)
-				{
-					b0 = 10;
-				}
+    protected void applyEntityAttributes() {
+        super.applyEntityAttributes();
+    }
 
-				if(b0 > 0)
-				{
-					((EntityLivingBase) target).addPotionEffect(new PotionEffect(Potion.poison.id, b0 * 20, 0));
-				}
-			}
+    public boolean attackEntityAsMob(Entity target) {
+        if (super.attackEntityAsMob(target)) {
+            if (target instanceof EntityLivingBase) {
+                byte b0 = 0;
 
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
+                if (this.worldObj.difficultySetting == EnumDifficulty.EASY) {
+                    b0 = 5;
+                } else if (this.worldObj.difficultySetting == EnumDifficulty.NORMAL) {
+                    b0 = 8;
+                } else if (this.worldObj.difficultySetting == EnumDifficulty.HARD) {
+                    b0 = 10;
+                }
 
-	public void onLivingUpdate()
-	{
-		super.onLivingUpdate();
+                if (b0 > 0) {
+                    ((EntityLivingBase) target).addPotionEffect(new PotionEffect(Potion.poison.id, b0 * 20, 0));
+                }
+            }
 
-		if(this.isWet())
-		{
-			this.attackEntityFrom(DamageSource.drown, 1.0F);
-		}
-	}
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	protected void dropFewItems(boolean playerkill, int looting)
-	{
-		int j = this.rand.nextInt(3) + this.rand.nextInt(1 + looting);
+    public void onLivingUpdate() {
+        super.onLivingUpdate();
 
-		for(int k = 0; k < j; ++k)
-		{
-			this.dropItem(WildMobsModItems.infectedFlesh, 1);
-		}
-	}
+        if (this.isWet()) {
+            this.attackEntityFrom(DamageSource.drown, 1.0F);
+        }
+    }
 
-	public IEntityLivingData onSpawnWithEgg(IEntityLivingData data)
-	{
-		super.onSpawnWithEgg(data);
-		this.setVillager(false);
-		return data;
-	}
+    protected void dropFewItems(boolean playerkill, int looting) {
+        int j = this.rand.nextInt(3) + this.rand.nextInt(1 + looting);
+
+        for (int k = 0; k < j; ++k) {
+            this.dropItem(WildMobsModItems.infectedFlesh, 1);
+        }
+    }
+
+    public IEntityLivingData onSpawnWithEgg(IEntityLivingData data) {
+        super.onSpawnWithEgg(data);
+        this.setVillager(false);
+        return data;
+    }
 }

@@ -1,18 +1,19 @@
 package com.wildmobsmod.entity.passive.hyena;
 
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.MathHelper;
 
+import org.lwjgl.opengl.GL11;
+
 /**
  * Model by DoctorHyena
  * Created using Tabula 4.1.1
  */
 public class ModelHyena extends ModelBase {
+
     public ModelRenderer head;
     public ModelRenderer leg1;
     public ModelRenderer leg4;
@@ -83,94 +84,83 @@ public class ModelHyena extends ModelBase {
     }
 
     @Override
-    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) { 
-    	super.render(entity, f, f1, f2, f3, f4, f5);
-		setRotationAngles(f, f1, f2, f3, f4, f5, entity);
-		if(this.isChild)
-		{
-			float f6 = 2.0F;
-			GL11.glPushMatrix();
-			GL11.glScalef(1.3F / f6, 1.3F / f6, 1.3F / f6);
-			GL11.glTranslatef(0.0F, 17.0F * f5, 2.0F * f5);
-			head.render(f5);
-			GL11.glPopMatrix();
-			GL11.glPushMatrix();
-			GL11.glScalef(1.0F / f6, 1.0F / f6, 1.0F / f6);
-			GL11.glTranslatef(0.0F, 24.0F * f5, 0.0F);
-			body.render(f5);
-			leg1.render(f5);
-			leg2.render(f5);
-			leg3.render(f5);
-			leg4.render(f5);
-			tail.render(f5);
-			GL11.glPopMatrix();
-		}
-		else
-		{
-			head.render(f5);
-			body.render(f5);
-			leg1.render(f5);
-			leg2.render(f5);
-			leg3.render(f5);
-			leg4.render(f5);
-			tail.render(f5);
-		}
+    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
+        super.render(entity, f, f1, f2, f3, f4, f5);
+        setRotationAngles(f, f1, f2, f3, f4, f5, entity);
+        if (this.isChild) {
+            float f6 = 2.0F;
+            GL11.glPushMatrix();
+            GL11.glScalef(1.3F / f6, 1.3F / f6, 1.3F / f6);
+            GL11.glTranslatef(0.0F, 17.0F * f5, 2.0F * f5);
+            head.render(f5);
+            GL11.glPopMatrix();
+            GL11.glPushMatrix();
+            GL11.glScalef(1.0F / f6, 1.0F / f6, 1.0F / f6);
+            GL11.glTranslatef(0.0F, 24.0F * f5, 0.0F);
+            body.render(f5);
+            leg1.render(f5);
+            leg2.render(f5);
+            leg3.render(f5);
+            leg4.render(f5);
+            tail.render(f5);
+            GL11.glPopMatrix();
+        } else {
+            head.render(f5);
+            body.render(f5);
+            leg1.render(f5);
+            leg2.render(f5);
+            leg3.render(f5);
+            leg4.render(f5);
+            tail.render(f5);
+        }
     }
 
     public void setRotateAngle(ModelRenderer modelRenderer, float x, float y, float z) {
         modelRenderer.rotateAngleX = x;
         modelRenderer.rotateAngleY = y;
         modelRenderer.rotateAngleZ = z;
-    }  
+    }
 
-	public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity)
-	{
-		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
-		this.head.rotateAngleX = f4 / (180F / (float) Math.PI);
-		this.head.rotateAngleY = f3 / (360F / (float) Math.PI);
-		this.head.rotationPointZ = -4.2F;
-		this.tail.rotateAngleZ = MathHelper.cos(f * 0.666F) * 0.5F * f1;
-	}
+    public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) {
+        super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
+        this.head.rotateAngleX = f4 / (180F / (float) Math.PI);
+        this.head.rotateAngleY = f3 / (360F / (float) Math.PI);
+        this.head.rotationPointZ = -4.2F;
+        this.tail.rotateAngleZ = MathHelper.cos(f * 0.666F) * 0.5F * f1;
+    }
 
-	public void setLivingAnimations(EntityLivingBase living, float f1, float f2, float f3)
-	{
-		EntityHyena entityhyena = (EntityHyena) living;
+    public void setLivingAnimations(EntityLivingBase living, float f1, float f2, float f3) {
+        EntityHyena entityhyena = (EntityHyena) living;
 
-		this.body.rotationPointY = 11.0F;
-		this.head.rotationPointY = 7.5F;
-		this.tail.rotationPointY = 8.0F;
-		this.leg1.rotationPointY = 12.0F;
-		this.leg2.rotationPointY = 12.0F;
-		this.leg3.rotationPointY = 12.0F;
-		this.leg4.rotationPointY = 12.0F;
+        this.body.rotationPointY = 11.0F;
+        this.head.rotationPointY = 7.5F;
+        this.tail.rotationPointY = 8.0F;
+        this.leg1.rotationPointY = 12.0F;
+        this.leg2.rotationPointY = 12.0F;
+        this.leg3.rotationPointY = 12.0F;
+        this.leg4.rotationPointY = 12.0F;
 
-		if(entityhyena.isSneaking())
-		{
-			this.body.rotationPointY += 3.0F;
-			if(this.isChild)
-			{
-				this.head.rotationPointY += 2.5F;
-			}
-			else
-			{
-				this.head.rotationPointY += 5.0F;
-			}
-			this.tail.rotationPointY += 3.0F;
-			this.leg1.rotationPointY += 3.0F;
-			this.leg2.rotationPointY += 3.0F;
-			this.leg3.rotationPointY += 3.0F;
-			this.leg4.rotationPointY += 3.0F;
-			this.leg1.rotateAngleX = 0.461799F;
-			this.leg2.rotateAngleX = 0.461799F;
-			this.leg3.rotateAngleX = -0.461799F;
-			this.leg4.rotateAngleX = -0.461799F;
-		}
-		else
-		{
-			this.leg1.rotateAngleX = MathHelper.cos(f1 * 0.6662F) * 1.4F * f2;
-			this.leg2.rotateAngleX = MathHelper.cos(f1 * 0.6662F + (float) Math.PI) * 1.4F * f2;
-			this.leg3.rotateAngleX = MathHelper.cos(f1 * 0.6662F + (float) Math.PI) * 1.4F * f2;
-			this.leg4.rotateAngleX = MathHelper.cos(f1 * 0.6662F) * 1.4F * f2;
-		}
-	}
+        if (entityhyena.isSneaking()) {
+            this.body.rotationPointY += 3.0F;
+            if (this.isChild) {
+                this.head.rotationPointY += 2.5F;
+            } else {
+                this.head.rotationPointY += 5.0F;
+            }
+            this.tail.rotationPointY += 3.0F;
+            this.leg1.rotationPointY += 3.0F;
+            this.leg2.rotationPointY += 3.0F;
+            this.leg3.rotationPointY += 3.0F;
+            this.leg4.rotationPointY += 3.0F;
+            this.leg1.rotateAngleX = 0.461799F;
+            this.leg2.rotateAngleX = 0.461799F;
+            this.leg3.rotateAngleX = -0.461799F;
+            this.leg4.rotateAngleX = -0.461799F;
+        } else {
+            this.leg1.rotateAngleX = MathHelper.cos(f1 * 0.6662F) * 1.4F * f2;
+            this.leg2.rotateAngleX = MathHelper.cos(f1 * 0.6662F + (float) Math.PI) * 1.4F * f2;
+            this.leg3.rotateAngleX = MathHelper.cos(f1 * 0.6662F + (float) Math.PI) * 1.4F * f2;
+            this.leg4.rotateAngleX = MathHelper.cos(f1 * 0.6662F) * 1.4F * f2;
+        }
+    }
 }

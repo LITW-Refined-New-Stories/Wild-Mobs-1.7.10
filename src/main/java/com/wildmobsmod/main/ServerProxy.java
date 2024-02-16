@@ -1,12 +1,10 @@
 package com.wildmobsmod.main;
 
-public class ServerProxy extends CommonProxy
-{
+public class ServerProxy extends CommonProxy {
 
-	@Override
-	public void registerRenderThings()
-	{
-		
-	}
+    @Override
+    public void registerRenderThings() {
+
+    }
 
 }

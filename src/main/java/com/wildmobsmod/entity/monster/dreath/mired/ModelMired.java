@@ -10,40 +10,36 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
-public class ModelMired extends ModelBase
-{
-	// fields
-	ModelRenderer Head;
+public class ModelMired extends ModelBase {
 
-	public ModelMired()
-	{
-		textureWidth = 64;
-		textureHeight = 32;
+    // fields
+    ModelRenderer Head;
 
-		Head = new ModelRenderer(this, 0, 0);
-		Head.addBox(-4F, -8F, -4F, 8, 8, 8);
-		Head.setRotationPoint(0F, 24F, 0F);
-		Head.setTextureSize(64, 32);
-		setRotation(Head, 0F, 0F, 0F);
-	}
+    public ModelMired() {
+        textureWidth = 64;
+        textureHeight = 32;
 
-	public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5)
-	{
-		super.render(entity, f, f1, f2, f3, f4, f5);
-		setRotationAngles(f, f1, f2, f3, f4, f5, entity);
-		Head.render(f5);
-	}
+        Head = new ModelRenderer(this, 0, 0);
+        Head.addBox(-4F, -8F, -4F, 8, 8, 8);
+        Head.setRotationPoint(0F, 24F, 0F);
+        Head.setTextureSize(64, 32);
+        setRotation(Head, 0F, 0F, 0F);
+    }
 
-	private void setRotation(ModelRenderer model, float x, float y, float z)
-	{
-		model.rotateAngleX = x;
-		model.rotateAngleY = y;
-		model.rotateAngleZ = z;
-	}
+    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
+        super.render(entity, f, f1, f2, f3, f4, f5);
+        setRotationAngles(f, f1, f2, f3, f4, f5, entity);
+        Head.render(f5);
+    }
 
-	public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity)
-	{
-		super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
-	}
+    private void setRotation(ModelRenderer model, float x, float y, float z) {
+        model.rotateAngleX = x;
+        model.rotateAngleY = y;
+        model.rotateAngleZ = z;
+    }
+
+    public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) {
+        super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
+    }
 
 }

@@ -1,11 +1,5 @@
 package com.wildmobsmod.entity.passive.wolf;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import com.wildmobsmod.entity.ISkinnedEntity;
-import com.wildmobsmod.main.WildMobsMod;
-
 import net.minecraft.block.BlockColored;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
@@ -22,190 +16,158 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.BiomeDictionary;
 
-public class EntityWMWolf extends EntityWolf implements ISkinnedEntity
-{
-	//
-	// Wolves now have random skins when tamed similar to ocelots/cats. Tamed
-	// wolves will also be named Dogs instead of staying as Wolves. Adding more
-	// wild variants as arctic wolves would be pretty cool.
-	//
+import com.wildmobsmod.entity.ISkinnedEntity;
+import com.wildmobsmod.main.WildMobsMod;
 
-	public EntityWMWolf(World world)
-	{
-		super(world);
-	}
+public class EntityWMWolf extends EntityWolf implements ISkinnedEntity {
+    //
+    // Wolves now have random skins when tamed similar to ocelots/cats. Tamed
+    // wolves will also be named Dogs instead of staying as Wolves. Adding more
+    // wild variants as arctic wolves would be pretty cool.
+    //
 
-	public int getMaxSpawnedInChunk()
-	{
-		return WildMobsMod.WOLF_CONFIG.getMaxPackSize();
-	}
+    public EntityWMWolf(World world) {
+        super(world);
+    }
 
-	protected void entityInit()
-	{
-		super.entityInit();
-		this.dataWatcher.addObject(21, Byte.valueOf((byte) 0));
-	}
+    public int getMaxSpawnedInChunk() {
+        return WildMobsMod.WOLF_CONFIG.getMaxPackSize();
+    }
 
-	public void writeEntityToNBT(NBTTagCompound nbt)
-	{
-		super.writeEntityToNBT(nbt);
-		nbt.setInteger("WolfType", this.getSkin());
-	}
+    protected void entityInit() {
+        super.entityInit();
+        this.dataWatcher.addObject(21, Byte.valueOf((byte) 0));
+    }
 
-	public void readEntityFromNBT(NBTTagCompound nbt)
-	{
-		super.readEntityFromNBT(nbt);
-		this.setSkin(nbt.getInteger("WolfType"));
-	}
+    public void writeEntityToNBT(NBTTagCompound nbt) {
+        super.writeEntityToNBT(nbt);
+        nbt.setInteger("WolfType", this.getSkin());
+    }
 
-	public int getSkin()
-	{
-		return this.dataWatcher.getWatchableObjectByte(21);
-	}
+    public void readEntityFromNBT(NBTTagCompound nbt) {
+        super.readEntityFromNBT(nbt);
+        this.setSkin(nbt.getInteger("WolfType"));
+    }
 
-	public void setSkin(int skinId)
-	{
-		this.dataWatcher.updateObject(21, Byte.valueOf((byte) skinId));
-	}
+    public int getSkin() {
+        return this.dataWatcher.getWatchableObjectByte(21);
+    }
 
-	public boolean interact(EntityPlayer player)
-	{
-		ItemStack itemstack = player.inventory.getCurrentItem();
+    public void setSkin(int skinId) {
+        this.dataWatcher.updateObject(21, Byte.valueOf((byte) skinId));
+    }
 
-		if(this.isTamed())
-		{
-			if(itemstack != null)
-			{
-				if(itemstack.getItem() instanceof ItemFood)
-				{
-					ItemFood itemfood = (ItemFood) itemstack.getItem();
+    public boolean interact(EntityPlayer player) {
+        ItemStack itemstack = player.inventory.getCurrentItem();
 
-					if(itemfood.isWolfsFavoriteMeat() && this.dataWatcher.getWatchableObjectFloat(18) < 20.0F)
-					{
-						if(!player.capabilities.isCreativeMode)
-						{
-							--itemstack.stackSize;
-						}
+        if (this.isTamed()) {
+            if (itemstack != null) {
+                if (itemstack.getItem() instanceof ItemFood) {
+                    ItemFood itemfood = (ItemFood) itemstack.getItem();
 
-						this.heal((float) itemfood.func_150905_g(itemstack));
+                    if (itemfood.isWolfsFavoriteMeat() && this.dataWatcher.getWatchableObjectFloat(18) < 20.0F) {
+                        if (!player.capabilities.isCreativeMode) {
+                            --itemstack.stackSize;
+                        }
 
-						if(itemstack.stackSize <= 0)
-						{
-							player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
-						}
+                        this.heal((float) itemfood.func_150905_g(itemstack));
 
-						return true;
-					}
-				}
-				else if(itemstack.getItem() == Items.dye)
-				{
-					int i = BlockColored.func_150032_b(itemstack.getItemDamage());
+                        if (itemstack.stackSize <= 0) {
+                            player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
+                        }
 
-					if(i != this.getCollarColor())
-					{
-						this.setCollarColor(i);
+                        return true;
+                    }
+                } else if (itemstack.getItem() == Items.dye) {
+                    int i = BlockColored.func_150032_b(itemstack.getItemDamage());
 
-						if(!player.capabilities.isCreativeMode && --itemstack.stackSize <= 0)
-						{
-							player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
-						}
+                    if (i != this.getCollarColor()) {
+                        this.setCollarColor(i);
 
-						return true;
-					}
-				}
-			}
+                        if (!player.capabilities.isCreativeMode && --itemstack.stackSize <= 0) {
+                            player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
+                        }
 
-			if(this.func_152114_e(player) && !this.worldObj.isRemote && !this.isBreedingItem(itemstack))
-			{
-				this.aiSit.setSitting(!this.isSitting());
-				this.isJumping = false;
-				this.setPathToEntity((PathEntity) null);
-				this.setTarget((Entity) null);
-				this.setAttackTarget((EntityLivingBase) null);
-			}
-		}
-		else if(itemstack != null && itemstack.getItem() == Items.bone && !this.isAngry())
-		{
-			if(!player.capabilities.isCreativeMode)
-			{
-				--itemstack.stackSize;
-			}
+                        return true;
+                    }
+                }
+            }
 
-			if(itemstack.stackSize <= 0)
-			{
-				player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
-			}
+            if (this.func_152114_e(player) && !this.worldObj.isRemote && !this.isBreedingItem(itemstack)) {
+                this.aiSit.setSitting(!this.isSitting());
+                this.isJumping = false;
+                this.setPathToEntity((PathEntity) null);
+                this.setTarget((Entity) null);
+                this.setAttackTarget((EntityLivingBase) null);
+            }
+        } else if (itemstack != null && itemstack.getItem() == Items.bone && !this.isAngry()) {
+            if (!player.capabilities.isCreativeMode) {
+                --itemstack.stackSize;
+            }
 
-			if(!this.worldObj.isRemote)
-			{
-				if(this.rand.nextInt(3) == 0)
-				{
-					this.setTamed(true);
-					if(this.worldObj.rand.nextBoolean()) this.setSkin(getSkin() == 1 ? 2 : 2 + this.worldObj.rand.nextInt(9));
-					this.setPathToEntity((PathEntity) null);
-					this.setAttackTarget((EntityLivingBase) null);
-					this.aiSit.setSitting(true);
-					this.setHealth(20.0F);
-					this.func_152115_b(player.getUniqueID().toString());
-					this.playTameEffect(true);
-					this.worldObj.setEntityState(this, (byte) 7);
-				}
-				else
-				{
-					this.playTameEffect(false);
-					this.worldObj.setEntityState(this, (byte) 6);
-				}
-			}
+            if (itemstack.stackSize <= 0) {
+                player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
+            }
 
-			return true;
-		}
+            if (!this.worldObj.isRemote) {
+                if (this.rand.nextInt(3) == 0) {
+                    this.setTamed(true);
+                    if (this.worldObj.rand.nextBoolean())
+                        this.setSkin(getSkin() == 1 ? 2 : 2 + this.worldObj.rand.nextInt(9));
+                    this.setPathToEntity((PathEntity) null);
+                    this.setAttackTarget((EntityLivingBase) null);
+                    this.aiSit.setSitting(true);
+                    this.setHealth(20.0F);
+                    this.func_152115_b(
+                        player.getUniqueID()
+                            .toString());
+                    this.playTameEffect(true);
+                    this.worldObj.setEntityState(this, (byte) 7);
+                } else {
+                    this.playTameEffect(false);
+                    this.worldObj.setEntityState(this, (byte) 6);
+                }
+            }
 
-		return super.interact(player);
-	}
+            return true;
+        }
 
-	public EntityWMWolf createChild(EntityAgeable parent)
-	{
-		EntityWMWolf entitywolf = new EntityWMWolf(this.worldObj);
-		String s = this.func_152113_b();
+        return super.interact(player);
+    }
 
-		if(s != null && s.trim().length() > 0)
-		{
-			entitywolf.func_152115_b(s);
-			entitywolf.setTamed(true);
-			entitywolf.setSkin(this.getSkin());
-		}
+    public EntityWMWolf createChild(EntityAgeable parent) {
+        EntityWMWolf entitywolf = new EntityWMWolf(this.worldObj);
+        String s = this.func_152113_b();
 
-		return entitywolf;
-	}
+        if (s != null && s.trim()
+            .length() > 0) {
+            entitywolf.func_152115_b(s);
+            entitywolf.setTamed(true);
+            entitywolf.setSkin(this.getSkin());
+        }
 
-	public String getCommandSenderName()
-	{
-		if(this.hasCustomNameTag())
-		{
-			return this.getCustomNameTag();
-		}
-		else
-		{
-			if(this.isTamed() && this.getSkin() > 2)
-			{
-				return StatCollector.translateToLocal("entity.Dog.name");
-			}
-			else
-			{
-				return StatCollector.translateToLocal("entity.Wolf.name");
-			}
-		}
-	}
+        return entitywolf;
+    }
 
-	public IEntityLivingData onSpawnWithEgg(IEntityLivingData data)
-	{
-		super.onSpawnWithEgg(data);
-		int i = MathHelper.floor_double(this.posX);
-		int j = MathHelper.floor_double(this.posZ);
-		BiomeGenBase biome = worldObj.getBiomeGenForCoords(i, j);
-		this.setSkin(biome.getEnableSnow() ? 1 : 0);
-		return data;
-	}
+    public String getCommandSenderName() {
+        if (this.hasCustomNameTag()) {
+            return this.getCustomNameTag();
+        } else {
+            if (this.isTamed() && this.getSkin() > 2) {
+                return StatCollector.translateToLocal("entity.Dog.name");
+            } else {
+                return StatCollector.translateToLocal("entity.Wolf.name");
+            }
+        }
+    }
+
+    public IEntityLivingData onSpawnWithEgg(IEntityLivingData data) {
+        super.onSpawnWithEgg(data);
+        int i = MathHelper.floor_double(this.posX);
+        int j = MathHelper.floor_double(this.posZ);
+        BiomeGenBase biome = worldObj.getBiomeGenForCoords(i, j);
+        this.setSkin(biome.getEnableSnow() ? 1 : 0);
+        return data;
+    }
 }

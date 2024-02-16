@@ -3,12 +3,6 @@ package com.wildmobsmod.entity.passive.ocelot;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.wildmobsmod.entity.ISkinnedEntity;
-import com.wildmobsmod.entity.ai.EntityAIWMOcelotSit;
-import com.wildmobsmod.entity.passive.mouse.EntityMouse;
-import com.wildmobsmod.items.WildMobsModItems;
-import com.wildmobsmod.main.WildMobsMod;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
@@ -41,392 +35,342 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary;
 
-public class EntityWMOcelot extends EntityTameable implements ISkinnedEntity
-{
-	//
-	// You may add more cat skins. Tamed cats will also be named Cats instead of
-	// Ocelots. There's also a new variant that spawns in forests: the Wild Cat.
-	//
+import com.wildmobsmod.entity.ISkinnedEntity;
+import com.wildmobsmod.entity.ai.EntityAIWMOcelotSit;
+import com.wildmobsmod.entity.passive.mouse.EntityMouse;
+import com.wildmobsmod.items.WildMobsModItems;
+import com.wildmobsmod.main.WildMobsMod;
 
-	private EntityAITempt aiTempt1;
-	private EntityAITempt aiTempt2;
+public class EntityWMOcelot extends EntityTameable implements ISkinnedEntity {
+    //
+    // You may add more cat skins. Tamed cats will also be named Cats instead of
+    // Ocelots. There's also a new variant that spawns in forests: the Wild Cat.
+    //
 
-	public EntityWMOcelot(World world)
-	{
-		super(world);
-		this.setSize(0.6F, 0.8F);
-		this.getNavigator().setAvoidsWater(true);
-		this.tasks.addTask(1, new EntityAISwimming(this));
-		this.tasks.addTask(2, this.aiSit);
-		this.tasks.addTask(3, this.aiTempt1 = new EntityAITempt(this, 0.6D, Items.fish, true));
-		this.tasks.addTask(3, this.aiTempt2 = new EntityAITempt(this, 0.6D, WildMobsModItems.rawMouse, true));
-		this.tasks.addTask(4, new EntityAIAvoidEntity(this, EntityPlayer.class, 16.0F, 0.8D, 1.33D));
-		this.tasks.addTask(5, new EntityAIFollowOwner(this, 1.0D, 10.0F, 5.0F));
-		this.tasks.addTask(6, new EntityAIWMOcelotSit(this, 1.33D));
-		this.tasks.addTask(7, new EntityAILeapAtTarget(this, 0.3F));
-		this.tasks.addTask(8, new EntityAIOcelotAttack(this));
-		this.tasks.addTask(9, new EntityAIMate(this, 0.8D));
-		this.tasks.addTask(10, new EntityAIWander(this, 0.8D));
-		this.tasks.addTask(11, new EntityAIWatchClosest(this, EntityPlayer.class, 10.0F));
-		this.targetTasks.addTask(1, new EntityAITargetNonTamed(this, EntityChicken.class, 750, false));
-		this.targetTasks.addTask(1, new EntityAINearestAttackableTarget(this, EntityMouse.class, 200, true));
-	}
+    private EntityAITempt aiTempt1;
+    private EntityAITempt aiTempt2;
 
-	public int getMaxSpawnedInChunk()
-	{
-		return WildMobsMod.OCELOT_CONFIG.getMaxPackSize();
-	}
+    public EntityWMOcelot(World world) {
+        super(world);
+        this.setSize(0.6F, 0.8F);
+        this.getNavigator()
+            .setAvoidsWater(true);
+        this.tasks.addTask(1, new EntityAISwimming(this));
+        this.tasks.addTask(2, this.aiSit);
+        this.tasks.addTask(3, this.aiTempt1 = new EntityAITempt(this, 0.6D, Items.fish, true));
+        this.tasks.addTask(3, this.aiTempt2 = new EntityAITempt(this, 0.6D, WildMobsModItems.rawMouse, true));
+        this.tasks.addTask(4, new EntityAIAvoidEntity(this, EntityPlayer.class, 16.0F, 0.8D, 1.33D));
+        this.tasks.addTask(5, new EntityAIFollowOwner(this, 1.0D, 10.0F, 5.0F));
+        this.tasks.addTask(6, new EntityAIWMOcelotSit(this, 1.33D));
+        this.tasks.addTask(7, new EntityAILeapAtTarget(this, 0.3F));
+        this.tasks.addTask(8, new EntityAIOcelotAttack(this));
+        this.tasks.addTask(9, new EntityAIMate(this, 0.8D));
+        this.tasks.addTask(10, new EntityAIWander(this, 0.8D));
+        this.tasks.addTask(11, new EntityAIWatchClosest(this, EntityPlayer.class, 10.0F));
+        this.targetTasks.addTask(1, new EntityAITargetNonTamed(this, EntityChicken.class, 750, false));
+        this.targetTasks.addTask(1, new EntityAINearestAttackableTarget(this, EntityMouse.class, 200, true));
+    }
 
-	protected void entityInit()
-	{
-		super.entityInit();
-		this.dataWatcher.addObject(18, Byte.valueOf((byte) 0));
-	}
+    public int getMaxSpawnedInChunk() {
+        return WildMobsMod.OCELOT_CONFIG.getMaxPackSize();
+    }
 
-	public void updateAITick()
-	{
-		if(this.getMoveHelper().isUpdating())
-		{
-			double d0 = this.getMoveHelper().getSpeed();
+    protected void entityInit() {
+        super.entityInit();
+        this.dataWatcher.addObject(18, Byte.valueOf((byte) 0));
+    }
 
-			if(d0 == 0.6D)
-			{
-				this.setSneaking(true);
-				this.setSprinting(false);
-			}
-			else if(d0 == 1.33D)
-			{
-				this.setSneaking(false);
-				this.setSprinting(true);
-			}
-			else
-			{
-				this.setSneaking(false);
-				this.setSprinting(false);
-			}
-		}
-		else
-		{
-			this.setSneaking(false);
-			this.setSprinting(false);
-		}
-	}
+    public void updateAITick() {
+        if (this.getMoveHelper()
+            .isUpdating()) {
+            double d0 = this.getMoveHelper()
+                .getSpeed();
 
-	protected boolean canDespawn()
-	{
-		return !this.isTamed() && this.ticksExisted > 2400;
-	}
+            if (d0 == 0.6D) {
+                this.setSneaking(true);
+                this.setSprinting(false);
+            } else if (d0 == 1.33D) {
+                this.setSneaking(false);
+                this.setSprinting(true);
+            } else {
+                this.setSneaking(false);
+                this.setSprinting(false);
+            }
+        } else {
+            this.setSneaking(false);
+            this.setSprinting(false);
+        }
+    }
 
-	public boolean isAIEnabled()
-	{
-		return true;
-	}
+    protected boolean canDespawn() {
+        return !this.isTamed() && this.ticksExisted > 2400;
+    }
 
-	protected void applyEntityAttributes()
-	{
-		super.applyEntityAttributes();
-		this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(10.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.30000001192092896D);
-	}
+    public boolean isAIEnabled() {
+        return true;
+    }
 
-	protected void fall(float distance) {}
+    protected void applyEntityAttributes() {
+        super.applyEntityAttributes();
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth)
+            .setBaseValue(10.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed)
+            .setBaseValue(0.30000001192092896D);
+    }
 
-	public void writeEntityToNBT(NBTTagCompound nbt)
-	{
-		super.writeEntityToNBT(nbt);
-		nbt.setInteger("CatType", this.getSkin());
-	}
+    protected void fall(float distance) {}
 
-	public void readEntityFromNBT(NBTTagCompound nbt)
-	{
-		super.readEntityFromNBT(nbt);
-		this.setSkin(nbt.getInteger("CatType"));
-	}
+    public void writeEntityToNBT(NBTTagCompound nbt) {
+        super.writeEntityToNBT(nbt);
+        nbt.setInteger("CatType", this.getSkin());
+    }
 
-	protected String getLivingSound()
-	{
-		return this.isTamed() ? (this.isInLove() ? "mob.cat.purr" : (this.rand.nextInt(4) == 0 ? "mob.cat.purreow" : "mob.cat.meow")) : null;
-	}
+    public void readEntityFromNBT(NBTTagCompound nbt) {
+        super.readEntityFromNBT(nbt);
+        this.setSkin(nbt.getInteger("CatType"));
+    }
 
-	protected String getHurtSound()
-	{
-		return "mob.cat.hitt";
-	}
+    protected String getLivingSound() {
+        return this.isTamed()
+            ? (this.isInLove() ? "mob.cat.purr" : (this.rand.nextInt(4) == 0 ? "mob.cat.purreow" : "mob.cat.meow"))
+            : null;
+    }
 
-	protected String getDeathSound()
-	{
-		return "mob.cat.hitt";
-	}
+    protected String getHurtSound() {
+        return "mob.cat.hitt";
+    }
 
-	protected float getSoundVolume()
-	{
-		return 0.4F;
-	}
+    protected String getDeathSound() {
+        return "mob.cat.hitt";
+    }
 
-	protected Item getDropItem()
-	{
-		return Items.leather;
-	}
+    protected float getSoundVolume() {
+        return 0.4F;
+    }
 
-	public boolean attackEntityAsMob(Entity target)
-	{
-		return target.attackEntityFrom(DamageSource.causeMobDamage(this), 3.0F);
-	}
+    protected Item getDropItem() {
+        return Items.leather;
+    }
 
-	public boolean attackEntityFrom(DamageSource source, float amount)
-	{
-		if(this.isEntityInvulnerable())
-		{
-			return false;
-		}
-		else
-		{
-			this.aiSit.setSitting(false);
-			return super.attackEntityFrom(source, amount);
-		}
-	}
+    public boolean attackEntityAsMob(Entity target) {
+        return target.attackEntityFrom(DamageSource.causeMobDamage(this), 3.0F);
+    }
 
-	protected void dropFewItems(boolean playerkill, int looting) {}
+    public boolean attackEntityFrom(DamageSource source, float amount) {
+        if (this.isEntityInvulnerable()) {
+            return false;
+        } else {
+            this.aiSit.setSitting(false);
+            return super.attackEntityFrom(source, amount);
+        }
+    }
 
-	public boolean interact(EntityPlayer player)
-	{
-		ItemStack itemstack = player.inventory.getCurrentItem();
+    protected void dropFewItems(boolean playerkill, int looting) {}
 
-		if(this.isTamed())
-		{
-			if(this.func_152114_e(player) && !this.worldObj.isRemote && !this.isBreedingItem(itemstack))
-			{
-				this.aiSit.setSitting(!this.isSitting());
-			}
-		}
-		else if(this.aiTempt1.isRunning() && itemstack != null && itemstack.getItem() == Items.fish && player.getDistanceSqToEntity(this) < 9.0D)
-		{
-			if(!player.capabilities.isCreativeMode)
-			{
-				--itemstack.stackSize;
-			}
+    public boolean interact(EntityPlayer player) {
+        ItemStack itemstack = player.inventory.getCurrentItem();
 
-			if(itemstack.stackSize <= 0)
-			{
-				player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
-			}
+        if (this.isTamed()) {
+            if (this.func_152114_e(player) && !this.worldObj.isRemote && !this.isBreedingItem(itemstack)) {
+                this.aiSit.setSitting(!this.isSitting());
+            }
+        } else if (this.aiTempt1.isRunning() && itemstack != null
+            && itemstack.getItem() == Items.fish
+            && player.getDistanceSqToEntity(this) < 9.0D) {
+                if (!player.capabilities.isCreativeMode) {
+                    --itemstack.stackSize;
+                }
 
-			if(!this.worldObj.isRemote)
-			{
-				if(this.rand.nextInt(3) == 0)
-				{
-					this.setTamed(true);
-					this.setSkin(1 + this.worldObj.rand.nextInt(6));
-					this.func_152115_b(player.getUniqueID().toString());
-					this.playTameEffect(true);
-					this.aiSit.setSitting(true);
-					this.worldObj.setEntityState(this, (byte) 7);
-				}
-				else
-				{
-					this.playTameEffect(false);
-					this.worldObj.setEntityState(this, (byte) 6);
-				}
-			}
+                if (itemstack.stackSize <= 0) {
+                    player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
+                }
 
-			return true;
-		}
-		else if(this.aiTempt2.isRunning() && itemstack != null && itemstack.getItem() == WildMobsModItems.rawMouse && player.getDistanceSqToEntity(this) < 9.0D)
-		{
-			if(!player.capabilities.isCreativeMode)
-			{
-				--itemstack.stackSize;
-			}
+                if (!this.worldObj.isRemote) {
+                    if (this.rand.nextInt(3) == 0) {
+                        this.setTamed(true);
+                        this.setSkin(1 + this.worldObj.rand.nextInt(6));
+                        this.func_152115_b(
+                            player.getUniqueID()
+                                .toString());
+                        this.playTameEffect(true);
+                        this.aiSit.setSitting(true);
+                        this.worldObj.setEntityState(this, (byte) 7);
+                    } else {
+                        this.playTameEffect(false);
+                        this.worldObj.setEntityState(this, (byte) 6);
+                    }
+                }
 
-			if(itemstack.stackSize <= 0)
-			{
-				player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
-			}
+                return true;
+            } else if (this.aiTempt2.isRunning() && itemstack != null
+                && itemstack.getItem() == WildMobsModItems.rawMouse
+                && player.getDistanceSqToEntity(this) < 9.0D) {
+                    if (!player.capabilities.isCreativeMode) {
+                        --itemstack.stackSize;
+                    }
 
-			if(!this.worldObj.isRemote)
-			{
-				if(this.rand.nextInt(3) == 0)
-				{
-					this.setTamed(true);
-					if(this.worldObj.rand.nextBoolean()) this.setSkin(1 + this.worldObj.rand.nextInt(6));
-					this.func_152115_b(player.getUniqueID().toString());
-					this.playTameEffect(true);
-					this.aiSit.setSitting(true);
-					this.worldObj.setEntityState(this, (byte) 7);
-				}
-				else
-				{
-					this.playTameEffect(false);
-					this.worldObj.setEntityState(this, (byte) 6);
-				}
-			}
+                    if (itemstack.stackSize <= 0) {
+                        player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
+                    }
 
-			return true;
-		}
-		else if(!this.worldObj.isRemote && itemstack != null && itemstack.getItem() == WildMobsModItems.wildCatSpawnEgg)
-		{
-			EntityWMOcelot entityageable = this.createChild(this);
-			entityageable.setGrowingAge(-24000);
-			entityageable.setLocationAndAngles(this.posX, this.posY, this.posZ, 0.0F, 0.0F);
-			worldObj.spawnEntityInWorld(entityageable);
+                    if (!this.worldObj.isRemote) {
+                        if (this.rand.nextInt(3) == 0) {
+                            this.setTamed(true);
+                            if (this.worldObj.rand.nextBoolean()) this.setSkin(1 + this.worldObj.rand.nextInt(6));
+                            this.func_152115_b(
+                                player.getUniqueID()
+                                    .toString());
+                            this.playTameEffect(true);
+                            this.aiSit.setSitting(true);
+                            this.worldObj.setEntityState(this, (byte) 7);
+                        } else {
+                            this.playTameEffect(false);
+                            this.worldObj.setEntityState(this, (byte) 6);
+                        }
+                    }
 
-			if(itemstack.hasDisplayName())
-			{
-				entityageable.setCustomNameTag(itemstack.getDisplayName());
-			}
+                    return true;
+                } else if (!this.worldObj.isRemote && itemstack != null
+                    && itemstack.getItem() == WildMobsModItems.wildCatSpawnEgg) {
+                        EntityWMOcelot entityageable = this.createChild(this);
+                        entityageable.setGrowingAge(-24000);
+                        entityageable.setLocationAndAngles(this.posX, this.posY, this.posZ, 0.0F, 0.0F);
+                        worldObj.spawnEntityInWorld(entityageable);
 
-			if(!player.capabilities.isCreativeMode)
-			{
-				--itemstack.stackSize;
+                        if (itemstack.hasDisplayName()) {
+                            entityageable.setCustomNameTag(itemstack.getDisplayName());
+                        }
 
-				if(itemstack.stackSize <= 0)
-				{
-					player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
-				}
-			}
-			return true;
-		}
-		else if(!this.worldObj.isRemote && itemstack != null && itemstack.getItem() == Items.spawn_egg && itemstack.getItemDamage() == 98)
-		{
-			EntityWMOcelot entityageable = this.createChild(this);
-			entityageable.setGrowingAge(-24000);
-			entityageable.setLocationAndAngles(this.posX, this.posY, this.posZ, 0.0F, 0.0F);
-			worldObj.spawnEntityInWorld(entityageable);
+                        if (!player.capabilities.isCreativeMode) {
+                            --itemstack.stackSize;
 
-			if(itemstack.hasDisplayName())
-			{
-				entityageable.setCustomNameTag(itemstack.getDisplayName());
-			}
+                            if (itemstack.stackSize <= 0) {
+                                player.inventory
+                                    .setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
+                            }
+                        }
+                        return true;
+                    } else if (!this.worldObj.isRemote && itemstack != null
+                        && itemstack.getItem() == Items.spawn_egg
+                        && itemstack.getItemDamage() == 98) {
+                            EntityWMOcelot entityageable = this.createChild(this);
+                            entityageable.setGrowingAge(-24000);
+                            entityageable.setLocationAndAngles(this.posX, this.posY, this.posZ, 0.0F, 0.0F);
+                            worldObj.spawnEntityInWorld(entityageable);
 
-			if(!player.capabilities.isCreativeMode)
-			{
-				--itemstack.stackSize;
+                            if (itemstack.hasDisplayName()) {
+                                entityageable.setCustomNameTag(itemstack.getDisplayName());
+                            }
 
-				if(itemstack.stackSize <= 0)
-				{
-					player.inventory.setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
-				}
-			}
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+                            if (!player.capabilities.isCreativeMode) {
+                                --itemstack.stackSize;
 
-		return super.interact(player);
-	}
+                                if (itemstack.stackSize <= 0) {
+                                    player.inventory
+                                        .setInventorySlotContents(player.inventory.currentItem, (ItemStack) null);
+                                }
+                            }
+                            return true;
+                        } else {
+                            return false;
+                        }
 
-	public EntityWMOcelot createChild(EntityAgeable parent)
-	{
-		EntityWMOcelot entityocelot = new EntityWMOcelot(this.worldObj);
+        return super.interact(player);
+    }
 
-		if(this.isTamed())
-		{
-			entityocelot.func_152115_b(this.func_152113_b());
-			entityocelot.setTamed(true);
-		}
-		entityocelot.setSkin(this.getSkin());
+    public EntityWMOcelot createChild(EntityAgeable parent) {
+        EntityWMOcelot entityocelot = new EntityWMOcelot(this.worldObj);
 
-		return entityocelot;
-	}
+        if (this.isTamed()) {
+            entityocelot.func_152115_b(this.func_152113_b());
+            entityocelot.setTamed(true);
+        }
+        entityocelot.setSkin(this.getSkin());
 
-	public boolean isBreedingItem(ItemStack stack)
-	{
-		return stack != null && (stack.getItem() == Items.fish || stack.getItem() == WildMobsModItems.rawMouse);
-	}
+        return entityocelot;
+    }
 
-	public boolean canMateWith(EntityAnimal potentialMate)
-	{
-		if(potentialMate != this && this.isTamed() && potentialMate instanceof EntityWMOcelot)
-		{
-			EntityWMOcelot entityocelot = (EntityWMOcelot) potentialMate;
-			return !entityocelot.isTamed() ? false : this.isInLove() && entityocelot.isInLove();
-		}
-		return false;
-	}
+    public boolean isBreedingItem(ItemStack stack) {
+        return stack != null && (stack.getItem() == Items.fish || stack.getItem() == WildMobsModItems.rawMouse);
+    }
 
-	public int getSkin()
-	{
-		return this.dataWatcher.getWatchableObjectByte(18);
-	}
+    public boolean canMateWith(EntityAnimal potentialMate) {
+        if (potentialMate != this && this.isTamed() && potentialMate instanceof EntityWMOcelot) {
+            EntityWMOcelot entityocelot = (EntityWMOcelot) potentialMate;
+            return !entityocelot.isTamed() ? false : this.isInLove() && entityocelot.isInLove();
+        }
+        return false;
+    }
 
-	public void setSkin(int skinId)
-	{
-		this.dataWatcher.updateObject(18, Byte.valueOf((byte) skinId));
-	}
+    public int getSkin() {
+        return this.dataWatcher.getWatchableObjectByte(18);
+    }
 
-	public boolean getCanSpawnHere()
-	{
-		if(this.worldObj.rand.nextInt(3) == 0)
-		{
-			return false;
-		}
-		else
-		{
-			if(this.worldObj.checkNoEntityCollision(this.boundingBox) && this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox).isEmpty() && !this.worldObj.isAnyLiquid(this.boundingBox))
-			{
-				int i = MathHelper.floor_double(this.posX);
-				int j = MathHelper.floor_double(this.boundingBox.minY);
-				int k = MathHelper.floor_double(this.posZ);
+    public void setSkin(int skinId) {
+        this.dataWatcher.updateObject(18, Byte.valueOf((byte) skinId));
+    }
 
-				Block block = this.worldObj.getBlock(i, j - 1, k);
+    public boolean getCanSpawnHere() {
+        if (this.worldObj.rand.nextInt(3) == 0) {
+            return false;
+        } else {
+            if (this.worldObj.checkNoEntityCollision(this.boundingBox)
+                && this.worldObj.getCollidingBoundingBoxes(this, this.boundingBox)
+                    .isEmpty()
+                && !this.worldObj.isAnyLiquid(this.boundingBox)) {
+                int i = MathHelper.floor_double(this.posX);
+                int j = MathHelper.floor_double(this.boundingBox.minY);
+                int k = MathHelper.floor_double(this.posZ);
 
-				if(block == Blocks.grass || block.isLeaves(worldObj, i, j - 1, k)) { return true; }
-			}
+                Block block = this.worldObj.getBlock(i, j - 1, k);
 
-			return false;
-		}
-	}
+                if (block == Blocks.grass || block.isLeaves(worldObj, i, j - 1, k)) {
+                    return true;
+                }
+            }
 
-	public String getCommandSenderName()
-	{
-		if(this.hasCustomNameTag())
-		{
-			return this.getCustomNameTag();
-		}
-		else
-		{
-			if(this.isTamed() && this.getSkin() > 0)
-			{
-				return StatCollector.translateToLocal("entity.Cat.name");
-			}
-			else
-			{
-				int i = this.getSkin();
+            return false;
+        }
+    }
 
-				switch(i)
-				{
-					case 0:
-						return StatCollector.translateToLocal("entity.Ocelot.name");
-					case 1:
-						return StatCollector.translateToLocal("entity.wildmobsmod.WildCat.name");
-					default:
-						return StatCollector.translateToLocal("entity.Cat.name");
-				}
-			}
-		}
-	}
+    public String getCommandSenderName() {
+        if (this.hasCustomNameTag()) {
+            return this.getCustomNameTag();
+        } else {
+            if (this.isTamed() && this.getSkin() > 0) {
+                return StatCollector.translateToLocal("entity.Cat.name");
+            } else {
+                int i = this.getSkin();
 
-	public IEntityLivingData onSpawnWithEgg(IEntityLivingData data)
-	{
-		data = super.onSpawnWithEgg(data);
-		int i = MathHelper.floor_double(this.posX);
-		int j = MathHelper.floor_double(this.posZ);
-		BiomeGenBase biome = worldObj.getBiomeGenForCoords(i, j);
-		ArrayList<BiomeDictionary.Type> biomeTypesList = new ArrayList<BiomeDictionary.Type>(Arrays.asList(BiomeDictionary.getTypesForBiome(worldObj.getBiomeGenForCoords(i, j))));
-		this.setSkin(biomeTypesList.contains(BiomeDictionary.Type.JUNGLE) ? 0 : 1);
-		if(this.worldObj.rand.nextInt(7) == 0)
-		{
-			for(int k = 0; k < 2; ++k)
-			{
-				EntityWMOcelot entityocelot = new EntityWMOcelot(this.worldObj);
-				entityocelot.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, 0.0F);
-				entityocelot.setSkin(this.getSkin());
-				entityocelot.setGrowingAge(-24000);
-				this.worldObj.spawnEntityInWorld(entityocelot);
-			}
-		}
-		return data;
-	}
+                switch (i) {
+                    case 0:
+                        return StatCollector.translateToLocal("entity.Ocelot.name");
+                    case 1:
+                        return StatCollector.translateToLocal("entity.wildmobsmod.WildCat.name");
+                    default:
+                        return StatCollector.translateToLocal("entity.Cat.name");
+                }
+            }
+        }
+    }
+
+    public IEntityLivingData onSpawnWithEgg(IEntityLivingData data) {
+        data = super.onSpawnWithEgg(data);
+        int i = MathHelper.floor_double(this.posX);
+        int j = MathHelper.floor_double(this.posZ);
+        BiomeGenBase biome = worldObj.getBiomeGenForCoords(i, j);
+        ArrayList<BiomeDictionary.Type> biomeTypesList = new ArrayList<BiomeDictionary.Type>(
+            Arrays.asList(BiomeDictionary.getTypesForBiome(worldObj.getBiomeGenForCoords(i, j))));
+        this.setSkin(biomeTypesList.contains(BiomeDictionary.Type.JUNGLE) ? 0 : 1);
+        if (this.worldObj.rand.nextInt(7) == 0) {
+            for (int k = 0; k < 2; ++k) {
+                EntityWMOcelot entityocelot = new EntityWMOcelot(this.worldObj);
+                entityocelot.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, 0.0F);
+                entityocelot.setSkin(this.getSkin());
+                entityocelot.setGrowingAge(-24000);
+                this.worldObj.spawnEntityInWorld(entityocelot);
+            }
+        }
+        return data;
+    }
 }
